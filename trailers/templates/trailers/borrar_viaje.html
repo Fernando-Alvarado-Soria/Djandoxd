@@ -1,0 +1,46 @@
+{% extends 'trailers/base.html' %}
+
+{% block title %}Borrar Viaje{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">🗑️ Confirmar Eliminación</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+                
+                <p class="lead">¿Estás seguro que deseas eliminar este viaje?</p>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ viaje.numero_viaje }}</h5>
+                        <p class="card-text">
+                            <strong>Ruta:</strong> {{ viaje.origen }} → {{ viaje.destino }}<br>
+                            <strong>Costo del viaje:</strong> ${{ viaje.costo_viaje }}<br>
+                            <strong>Ganancia:</strong> {% if viaje.ganancia %}${{ viaje.ganancia }}{% else %}Pendiente{% endif %}<br>
+                            <strong>Fecha:</strong> {{ viaje.fecha_creacion|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'lista_viajes' %}" class="btn btn-secondary">
+                            ❌ Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            🗑️ Sí, Eliminar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

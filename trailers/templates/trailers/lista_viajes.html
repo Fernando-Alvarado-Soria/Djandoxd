@@ -1,0 +1,104 @@
+{% extends 'trailers/base.html' %}
+
+{% block title %}Lista de Viajes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Lista de Viajes</h3>
+                <a href="{% url 'agregar_viaje' %}" class="btn btn-primary">
+                    ➕ Agregar Nuevo Viaje
+                </a>
+            </div>
+            <div class="card-body">
+                {% if viajes %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Número de Viaje</th>
+                                    <th>Ruta</th>
+                                    <th>Gastos Casetas</th>
+                                    <th>Gastos Diesel</th>
+                                    <th>Otros Gastos</th>
+                                    <th>Costo Total</th>
+                                    <th>Ganancia</th>
+                                    <th>Estado Pago</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for viaje in viajes %}
+                                <tr>
+                                    <td><strong>{{ viaje.numero_viaje }}</strong></td>
+                                    <td>{{ viaje.origen }} → {{ viaje.destino }}</td>
+                                    <td>${{ viaje.gastos_casetas|floatformat:2 }}</td>
+                                    <td>${{ viaje.gastos_diesel|floatformat:2 }}</td>
+                                    <td>${{ viaje.otros_gastos|floatformat:2 }}</td>
+                                    <td><strong>${{ viaje.costo_viaje|floatformat:2 }}</strong></td>
+                                    <td>
+                                        {% if viaje.ganancia %}
+                                            <span class="badge bg-success">
+                                                ${{ viaje.ganancia|floatformat:2 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Pendiente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if viaje.pagado %}
+                                            <span class="badge bg-success">✓ Pagado</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">⏳ Pendiente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ viaje.fecha_creacion|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="{% url 'editar_viaje' viaje.id %}" 
+                                               class="btn btn-sm btn-warning" 
+                                               title="Editar">
+                                                ✏️ Editar
+                                            </a>
+                                            <a href="{% url 'borrar_viaje' viaje.id %}" 
+                                               class="btn btn-sm btn-danger" 
+                                               title="Borrar">
+                                                🗑️ Borrar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-info">
+                                    <td colspan="6" class="text-end"><strong>Total Ganancia:</strong></td>
+                                    <td colspan="3">
+                                        <strong class="text-success">
+                                            ${% widthratio viajes.count 1 0 %}
+                                            {% for viaje in viajes %}
+                                                {% if forloop.first %}
+                                                    {{ viaje.ganancia|add:0 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <h5>No hay viajes registrados</h5>
+                        <p>Comienza agregando tu primer viaje.</p>
+                        <a href="{% url 'agregar_viaje' %}" class="btn btn-primary">Agregar Viaje</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

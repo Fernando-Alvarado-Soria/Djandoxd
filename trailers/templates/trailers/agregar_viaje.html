@@ -1,0 +1,196 @@
+{% extends 'trailers/base.html' %}
+
+{% block title %}Agregar Viaje{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">➕ Agregar Nuevo Viaje</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.numero_viaje.id_for_label }}" class="form-label">
+                                <strong>{{ form.numero_viaje.label }}</strong>
+                            </label>
+                            {{ form.numero_viaje }}
+                            {% if form.numero_viaje.errors %}
+                                <div class="text-danger">{{ form.numero_viaje.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.numero_contenedor.id_for_label }}" class="form-label">
+                                <strong>{{ form.numero_contenedor.label }}</strong>
+                            </label>
+                            {{ form.numero_contenedor }}
+                            {% if form.numero_contenedor.errors %}
+                                <div class="text-danger">{{ form.numero_contenedor.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.numero_factura.id_for_label }}" class="form-label">
+                                <strong>{{ form.numero_factura.label }}</strong>
+                            </label>
+                            {{ form.numero_factura }}
+                            {% if form.numero_factura.errors %}
+                                <div class="text-danger">{{ form.numero_factura.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.origen.id_for_label }}" class="form-label">
+                                <strong>{{ form.origen.label }}</strong>
+                            </label>
+                            {{ form.origen }}
+                            {% if form.origen.errors %}
+                                <div class="text-danger">{{ form.origen.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.destino.id_for_label }}" class="form-label">
+                                <strong>{{ form.destino.label }}</strong>
+                            </label>
+                            {{ form.destino }}
+                            {% if form.destino.errors %}
+                                <div class="text-danger">{{ form.destino.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.pagado.id_for_label }}" class="form-label">
+                                <strong>{{ form.pagado.label }}</strong>
+                            </label>
+                            {{ form.pagado }}
+                            {% if form.pagado.errors %}
+                                <div class="text-danger">{{ form.pagado.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="fechas_pago" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_pago.id_for_label }}" class="form-label">
+                                    <strong>{{ form.fecha_pago.label }}</strong>
+                                </label>
+                                {{ form.fecha_pago }}
+                                {% if form.fecha_pago.errors %}
+                                    <div class="text-danger">{{ form.fecha_pago.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_viaje.id_for_label }}" class="form-label">
+                                    <strong>{{ form.fecha_viaje.label }}</strong>
+                                </label>
+                                {{ form.fecha_viaje }}
+                                {% if form.fecha_viaje.errors %}
+                                    <div class="text-danger">{{ form.fecha_viaje.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.gastos_casetas.id_for_label }}" class="form-label">
+                                <strong>{{ form.gastos_casetas.label }}</strong>
+                            </label>
+                            {{ form.gastos_casetas }}
+                            {% if form.gastos_casetas.errors %}
+                                <div class="text-danger">{{ form.gastos_casetas.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.gastos_diesel.id_for_label }}" class="form-label">
+                                <strong>{{ form.gastos_diesel.label }}</strong>
+                            </label>
+                            {{ form.gastos_diesel }}
+                            {% if form.gastos_diesel.errors %}
+                                <div class="text-danger">{{ form.gastos_diesel.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.otros_gastos.id_for_label }}" class="form-label">
+                                <strong>{{ form.otros_gastos.label }}</strong>
+                            </label>
+                            {{ form.otros_gastos }}
+                            {% if form.otros_gastos.errors %}
+                                <div class="text-danger">{{ form.otros_gastos.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.costo_viaje.id_for_label }}" class="form-label">
+                                <strong>{{ form.costo_viaje.label }}</strong>
+                            </label>
+                            {{ form.costo_viaje }}
+                            {% if form.costo_viaje.errors %}
+                                <div class="text-danger">{{ form.costo_viaje.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.ganancia.id_for_label }}" class="form-label">
+                                <strong>{{ form.ganancia.label }}</strong> <span class="text-muted">(Opcional)</span>
+                            </label>
+                            {{ form.ganancia }}
+                            {% if form.ganancia.errors %}
+                                <div class="text-danger">{{ form.ganancia.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'lista_viajes' %}" class="btn btn-secondary">
+                            ❌ Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            💾 Guardar Viaje
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pagadoSelect = document.getElementById('id_pagado');
+        const fechasPago = document.getElementById('fechas_pago');
+        
+        function toggleFechasPago() {
+            if (pagadoSelect.value === 'True') {
+                fechasPago.style.display = 'block';
+            } else {
+                fechasPago.style.display = 'none';
+            }
+        }
+        
+        // Ejecutar al cargar la página
+        toggleFechasPago();
+        
+        // Ejecutar cuando cambie la selección
+        pagadoSelect.addEventListener('change', toggleFechasPago);
+    });
+</script>
+{% endblock %}
