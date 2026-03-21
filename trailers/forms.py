@@ -1,4 +1,22 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+
+class AdminUserCreationForm(UserCreationForm):
+    is_staff = forms.BooleanField(required=False, label='Con permisos de administrador (is_staff)')
+
+    class Meta:
+        model = User
+        fields = ('username', 'is_staff')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_staff = self.cleaned_data.get('is_staff', False)
+        if commit:
+            user.save()
+        return user
+from django import forms
 from .models import Viaje
 
 
