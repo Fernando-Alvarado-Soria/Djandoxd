@@ -62,9 +62,10 @@ WSGI_APPLICATION = 'patios.wsgi.application'
 # En producción usa DATABASE_URL (PostgreSQL de DigitalOcean)
 # En desarrollo local usa SQLite por defecto
 
+DATABASE_URL = config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+    'default': dj_database_url.parse(
+        DATABASE_URL,
         conn_max_age=600,
     )
 }
