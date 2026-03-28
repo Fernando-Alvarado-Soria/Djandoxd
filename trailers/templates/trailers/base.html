@@ -27,6 +27,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_viajes' %}">Lista de Viajes</a>
                     </li>
@@ -36,6 +37,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/admin/">Panel Admin</a>
                     </li>
+                    <li class="nav-item ms-2">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light btn-sm mt-1">Cerrar sesión</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
