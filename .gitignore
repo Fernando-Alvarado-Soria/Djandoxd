@@ -44,3 +44,12 @@ htmlcov/
 .coverage
 .tox/
 .pytest_cache/
+
+# Docker
+*.log
+docker-compose.override.yml
+.docker/
+
+# Media files
+media/
+mediafiles/
