@@ -13,13 +13,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --user --no-warn-script-location -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 FROM python:3.11.11-slim
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PATH=/root/.local/bin:$PATH
+    PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
@@ -31,7 +30,7 @@ RUN useradd -m -u 1000 django && \
 
 WORKDIR /app
 
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /install /usr/local
 COPY --chown=django:django . .
 COPY --chown=django:django docker-entrypoint.sh /app/docker-entrypoint.sh
 
