@@ -3,7 +3,6 @@ set -e
 
 echo "🚀 Iniciando aplicación Django..."
 
-# Esperar a que la base de datos esté lista (si usa PostgreSQL)
 echo "⏳ Esperando base de datos..."
 python << END
 import sys
@@ -41,18 +40,19 @@ if database_url and database_url.startswith('postgres'):
             attempt += 1
             print(f"⏳ Intento {attempt}/{max_attempts} - Base de datos no disponible, esperando...")
             time.sleep(2)
-    
+
     print("❌ No se pudo conectar a la base de datos")
     sys.exit(1)
 else:
-    print("ℹ️  Usando SQLite o base de datos ya disponible")
+    print("ℹ️ Usando SQLite o base de datos ya disponible")
 END
 
-# Ejecutar migraciones
 echo "📦 Ejecutando migraciones..."
 python manage.py migrate --noinput
 
-# Crear superusuario si no existe (opcional)
+echo "📦 Recolectando archivos estáticos..."
+python manage.py collectstatic --noinput
+
 echo "👤 Verificando superusuario..."
 python manage.py shell << END
 from django.contrib.auth import get_user_model
@@ -67,10 +67,8 @@ if password and not User.objects.filter(username=username).exists():
     User.objects.create_superuser(username=username, email=email, password=password)
     print(f"✅ Superusuario '{username}' creado")
 else:
-    print("ℹ️  Superusuario ya existe o no se proporcionó password")
+    print("ℹ️ Superusuario ya existe o no se proporcionó password")
 END
 
 echo "✅ Inicialización completa. Iniciando servidor..."
-
-# Ejecutar el comando proporcionado (gunicorn)
 exec "$@"
