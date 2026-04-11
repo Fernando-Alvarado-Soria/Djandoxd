@@ -1,7 +1,70 @@
 from django.contrib import admin
-from .models import Viaje
+from .models import Cliente, Operador, Unidad, Viaje
 
-# Register your models here.
+# ========================
+# ADMIN MODELOS BASE
+# ========================
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'rfc', 'activo', 'fecha_creacion']
+    list_filter = ['activo', 'fecha_creacion']
+    search_fields = ['nombre', 'rfc']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    
+    fieldsets = (
+        ('Información del Cliente', {
+            'fields': ('nombre', 'rfc', 'activo')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(Operador)
+class OperadorAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'licencia', 'activo', 'fecha_creacion']
+    list_filter = ['activo', 'fecha_creacion']
+    search_fields = ['nombre', 'licencia']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    
+    fieldsets = (
+        ('Información del Operador', {
+            'fields': ('nombre', 'licencia', 'activo')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(Unidad)
+class UnidadAdmin(admin.ModelAdmin):
+    list_display = ['numero_economico', 'placas', 'marca', 'modelo', 'anio', 'activo', 'fecha_creacion']
+    list_filter = ['activo', 'marca', 'anio', 'fecha_creacion']
+    search_fields = ['numero_economico', 'placas', 'marca', 'modelo']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    
+    fieldsets = (
+        ('Identificación', {
+            'fields': ('numero_economico', 'placas', 'activo')
+        }),
+        ('Especificaciones', {
+            'fields': ('marca', 'modelo', 'anio')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+# ========================
+# ADMIN VIAJE
+# ========================
 
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
