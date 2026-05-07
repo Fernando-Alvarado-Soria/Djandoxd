@@ -46,7 +46,15 @@ def editar_viaje(request, viaje_id):
             return redirect('lista_viajes')
     else:
         form = ViajeForm(instance=viaje)
-    return render(request, 'trailers/editar_viaje.html', {'form': form, 'viaje': viaje})
+    tipos_unidad = TipoUnidad.objects.all()
+    return render(request, 'trailers/editar_viaje.html', {'form': form, 'viaje': viaje, 'tipos_unidad': tipos_unidad})
+
+
+@login_required
+def detalle_viaje(request, viaje_id):
+    """Vista de solo lectura para ver todos los datos de un viaje"""
+    viaje = get_object_or_404(Viaje, id=viaje_id)
+    return render(request, 'trailers/detalle_viaje.html', {'viaje': viaje})
 
 
 @login_required

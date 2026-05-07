@@ -124,7 +124,7 @@ class Viaje(models.Model):
     )
     viaje_redondo = models.BooleanField(default=False, verbose_name="¿Viaje redondo (ida y vuelta)?")
     precio_diesel_litro = models.DecimalField(
-        max_digits=8, decimal_places=2, null=True, blank=True,
+        max_digits=8, decimal_places=3, null=True, blank=True,
         verbose_name="Precio diesel por litro ($)"
     )
     pagado = models.BooleanField(default=False, verbose_name="¿Viaje pagado?")

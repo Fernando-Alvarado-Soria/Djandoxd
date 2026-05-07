@@ -241,17 +241,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const precio = parseFloat(precioDieselInput.value) || 0;
         const rendimiento = getRendimiento();
 
-        if (km > 0 && precio > 0 && rendimiento) {
-            const kmTotal = redondo ? km * 2 : km;
-            const litros = kmTotal / rendimiento;
-            const costo = litros * precio;
-            gastosDieselInput.value = costo.toFixed(2);
-            calculoDetalle.textContent =
-                `${km} km${redondo ? ' × 2 (redondo)' : ''} = ${kmTotal} km | ${litros.toFixed(1)} litros × $${precio} = $${costo.toFixed(2)}`;
+        // Mensajes si faltan datos
+        if (!rendimiento) {
+            calculoDetalle.textContent = '⚠️ Selecciona el tipo de unidad para calcular el diesel.';
             calculoInfo.style.display = 'block';
-        } else {
-            calculoInfo.style.display = 'none';
+            return;
         }
+        if (km <= 0) {
+            calculoDetalle.textContent = '⚠️ Calcula primero la distancia (km).';
+            calculoInfo.style.display = 'block';
+            return;
+        }
+        if (precio <= 0) {
+            calculoDetalle.textContent = '⚠️ Ingresa el precio por litro de diesel.';
+            calculoInfo.style.display = 'block';
+            return;
+        }
+
+        const kmTotal = redondo ? km * 2 : km;
+        const litros = kmTotal / rendimiento;
+        const costo = litros * precio;
+        gastosDieselInput.value = costo.toFixed(2);
+        calculoDetalle.textContent =
+            `${km} km${redondo ? ' × 2 (redondo)' : ''} = ${kmTotal} km ÷ ${rendimiento} km/L = ${litros.toFixed(1)} L × $${precio} = $${costo.toFixed(2)}`;
+        calculoInfo.style.display = 'block';
     }
 
     tipoUnidadSelect.addEventListener('change', function () {

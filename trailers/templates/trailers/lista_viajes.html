@@ -33,7 +33,11 @@
                             <tbody>
                                 {% for viaje in viajes %}
                                 <tr>
-                                    <td><strong>{{ viaje.numero_viaje }}</strong></td>
+                                    <td>
+                                        <a href="{% url 'detalle_viaje' viaje.id %}" class="fw-bold text-decoration-none">
+                                            {{ viaje.numero_viaje }}
+                                        </a>
+                                    </td>
                                     <td>{{ viaje.origen }} → {{ viaje.destino }}</td>
                                     <td>${{ viaje.gastos_casetas|floatformat:2 }}</td>
                                     <td>${{ viaje.gastos_diesel|floatformat:2 }}</td>

@@ -1,0 +1,164 @@
+{% extends 'trailers/base.html' %}
+
+{% block title %}Detalle Viaje {{ viaje.numero_viaje }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">🚚 Viaje: {{ viaje.numero_viaje }}</h3>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'editar_viaje' viaje.id %}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                    <a href="{% url 'lista_viajes' %}" class="btn btn-secondary btn-sm">← Volver</a>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Identificación -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Identificación</h5>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Número de viaje</small>
+                        <p class="fw-bold mb-0">{{ viaje.numero_viaje }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Número de contenedor</small>
+                        <p class="mb-0">{{ viaje.numero_contenedor|default:"—" }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Número de factura</small>
+                        <p class="mb-0">{{ viaje.numero_factura|default:"—" }}</p>
+                    </div>
+                </div>
+
+                <!-- Unidad -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Unidad</h5>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <small class="text-muted">Tipo de unidad</small>
+                        <p class="mb-0">
+                            {% if viaje.tipo_unidad %}
+                                {{ viaje.tipo_unidad.nombre }}
+                                <span class="text-muted">({{ viaje.tipo_unidad.rendimiento_km_litro }} km/L)</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ruta -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Ruta</h5>
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <small class="text-muted">Origen</small>
+                        <p class="fw-bold mb-0">{{ viaje.origen }}</p>
+                    </div>
+                    <div class="col-md-2 text-center align-self-center">
+                        <span class="fs-4">→</span>
+                    </div>
+                    <div class="col-md-5">
+                        <small class="text-muted">Destino</small>
+                        <p class="fw-bold mb-0">{{ viaje.destino }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Distancia (solo ida)</small>
+                        <p class="mb-0">
+                            {% if viaje.km_distancia %}{{ viaje.km_distancia|floatformat:1 }} km{% else %}—{% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">¿Viaje redondo?</small>
+                        <p class="mb-0">
+                            {% if viaje.viaje_redondo %}
+                                <span class="badge bg-info">Sí (ida y vuelta)</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No (solo ida)</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Precio diesel/litro</small>
+                        <p class="mb-0">
+                            {% if viaje.precio_diesel_litro %}${{ viaje.precio_diesel_litro|floatformat:3 }}{% else %}—{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Costos -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Costos y Gastos</h5>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <small class="text-muted">Gastos casetas</small>
+                        <p class="mb-0">${{ viaje.gastos_casetas|floatformat:2 }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">Gastos diesel</small>
+                        <p class="mb-0">${{ viaje.gastos_diesel|floatformat:2 }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">Otros gastos</small>
+                        <p class="mb-0">${{ viaje.otros_gastos|floatformat:2 }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">Costo del viaje</small>
+                        <p class="fw-bold mb-0 fs-5">${{ viaje.costo_viaje|floatformat:2 }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Ganancia</small>
+                        <p class="mb-0">
+                            {% if viaje.ganancia %}
+                                <span class="badge bg-success fs-6">${{ viaje.ganancia|floatformat:2 }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Pendiente</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pago y Fechas -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Pago y Fechas</h5>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Estado de pago</small>
+                        <p class="mb-0">
+                            {% if viaje.pagado %}
+                                <span class="badge bg-success">✓ Pagado</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">⏳ Pendiente</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Fecha de viaje</small>
+                        <p class="mb-0">{{ viaje.fecha_viaje|date:"d/m/Y"|default:"—" }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Fecha de pago</small>
+                        <p class="mb-0">{{ viaje.fecha_pago|date:"d/m/Y"|default:"—" }}</p>
+                    </div>
+                </div>
+
+                <!-- Registro -->
+                <h5 class="text-muted border-bottom pb-1 mb-3">Registro</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">Creado</small>
+                        <p class="mb-0">{{ viaje.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Última actualización</small>
+                        <p class="mb-0">{{ viaje.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

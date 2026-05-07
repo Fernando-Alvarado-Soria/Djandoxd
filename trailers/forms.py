@@ -55,8 +55,8 @@ class ViajeForm(forms.ModelForm):
             }),
             'viaje_redondo': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_viaje_redondo'}),
             'precio_diesel_litro': forms.NumberInput(attrs={
-                'class': 'form-control', 'step': '0.01', 'min': '0',
-                'id': 'id_precio_diesel_litro', 'placeholder': 'Ej: 24.50'
+                'class': 'form-control', 'step': '0.001', 'min': '0',
+                'id': 'id_precio_diesel_litro', 'placeholder': 'Ej: 28.015'
             }),
             'fecha_pago': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_viaje': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
