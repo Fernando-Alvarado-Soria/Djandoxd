@@ -116,6 +116,9 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 
+# --- OpenRouteService ---
+ORS_API_KEY = config('ORS_API_KEY', default='')
+
 # --- Production security headers ---
 if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000

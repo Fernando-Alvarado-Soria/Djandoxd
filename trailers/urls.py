@@ -7,4 +7,5 @@ urlpatterns = [
     path('editar/<int:viaje_id>/', views.editar_viaje, name='editar_viaje'),
     path('borrar/<int:viaje_id>/', views.borrar_viaje, name='borrar_viaje'),
     path('accounts/register/', views.register, name='register'),
+    path('api/calcular-distancia/', views.calcular_distancia, name='calcular_distancia'),
 ]

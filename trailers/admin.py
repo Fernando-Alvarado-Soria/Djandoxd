@@ -1,9 +1,14 @@
 from django.contrib import admin
-from .models import Cliente, Operador, Unidad, Viaje
+from .models import Cliente, Operador, Unidad, Viaje, TipoUnidad
 
 # ========================
 # ADMIN MODELOS BASE
 # ========================
+
+@admin.register(TipoUnidad)
+class TipoUnidadAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'rendimiento_km_litro']
+    search_fields = ['nombre']
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):

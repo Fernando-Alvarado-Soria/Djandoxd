@@ -53,6 +53,24 @@ class Operador(models.Model):
         return f"{self.nombre} (Lic: {self.licencia})"
 
 
+class TipoUnidad(models.Model):
+    """Tipos de unidad/vehículo con su rendimiento típico de combustible"""
+    nombre = models.CharField(max_length=100, verbose_name="Tipo de unidad")
+    descripcion = models.TextField(blank=True, verbose_name="Descripción")
+    rendimiento_km_litro = models.DecimalField(
+        max_digits=5, decimal_places=2,
+        verbose_name="Rendimiento típico (km/litro)"
+    )
+
+    class Meta:
+        verbose_name = "Tipo de Unidad"
+        verbose_name_plural = "Tipos de Unidad"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.rendimiento_km_litro} km/L)"
+
+
 class Unidad(models.Model):
     """Modelo para representar unidades/vehículos (camiones, tractocamiones)"""
     numero_economico = models.CharField(
@@ -64,6 +82,11 @@ class Unidad(models.Model):
     marca = models.CharField(max_length=100, verbose_name="Marca")
     modelo = models.CharField(max_length=100, verbose_name="Modelo")
     anio = models.PositiveIntegerField(verbose_name="Año")
+    rendimiento_km_litro = models.DecimalField(
+        max_digits=5, decimal_places=2, default=3.50,
+        verbose_name="Rendimiento (km/litro)",
+        help_text="Kilómetros por litro de diesel. Ej: 3.5 para camión sencillo cargado."
+    )
     activo = models.BooleanField(default=True, verbose_name="Unidad activa")
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
@@ -85,8 +108,25 @@ class Viaje(models.Model):
     numero_viaje = models.CharField(max_length=100, unique=True, verbose_name="Número de viaje")
     numero_contenedor = models.CharField(max_length=100, blank=True, verbose_name="Número de contenedor")
     numero_factura = models.CharField(max_length=100, blank=True, verbose_name="Número de factura")
+    unidad = models.ForeignKey(
+        Unidad, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name="Unidad (camión)"
+    )
+    tipo_unidad = models.ForeignKey(
+        TipoUnidad, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name="Tipo de unidad"
+    )
     origen = models.CharField(max_length=200, verbose_name="Origen")
     destino = models.CharField(max_length=200, verbose_name="Destino")
+    km_distancia = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        verbose_name="Distancia (km, solo ida)"
+    )
+    viaje_redondo = models.BooleanField(default=False, verbose_name="¿Viaje redondo (ida y vuelta)?")
+    precio_diesel_litro = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True,
+        verbose_name="Precio diesel por litro ($)"
+    )
     pagado = models.BooleanField(default=False, verbose_name="¿Viaje pagado?")
     fecha_pago = models.DateField(null=True, blank=True, verbose_name="Fecha de pago")
     fecha_viaje = models.DateField(null=True, blank=True, verbose_name="Fecha de viaje")
