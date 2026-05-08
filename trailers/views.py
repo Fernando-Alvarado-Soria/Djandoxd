@@ -111,7 +111,7 @@ def calcular_distancia(request):
         if not coords_origen or not coords_destino:
             return JsonResponse({'error': 'No se pudo encontrar alguna de las ubicaciones'}, status=404)
 
-        url_ruta = 'https://api.openrouteservice.org/v2/directions/driving-hgv'
+        url_ruta = 'https://api.openrouteservice.org/v2/directions/driving-car'
         headers = {'Authorization': api_key, 'Content-Type': 'application/json'}
         body = {'coordinates': [coords_origen, coords_destino]}
         resp_ruta = http_requests.post(url_ruta, json=body, headers=headers, timeout=15)
