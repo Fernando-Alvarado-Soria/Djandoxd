@@ -1,0 +1,230 @@
+{% extends 'trailers/base.html' %}
+{% block title %}Reportes — {{ anio }}{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+    <div class="col">
+        <h2 class="mb-0">📊 Reportes de Utilidad y Gastos</h2>
+    </div>
+</div>
+
+<!-- Selector de año y botones de exportar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-auto">
+                <label class="form-label fw-bold">Año</label>
+                <select name="anio" class="form-select" onchange="this.form.submit()">
+                    {% for a in anios_disponibles %}
+                        <option value="{{ a }}" {% if a == anio %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto ms-auto d-flex gap-2">
+                <a href="{% url 'exportar_reporte_excel' %}?anio={{ anio }}"
+                   class="btn btn-success">
+                    <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                </a>
+                <a href="{% url 'exportar_reporte_pdf' %}?anio={{ anio }}"
+                   class="btn btn-danger">
+                    <i class="fas fa-file-pdf me-1"></i> Exportar PDF
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tarjetas de resumen anual -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Viajes {{ anio }}</div>
+                <div class="fs-3 fw-bold">{{ totales_anuales.num_viajes }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Ingresos totales</div>
+                <div class="fs-4 fw-bold text-primary">${{ totales_anuales.ingresos|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Gastos totales</div>
+                <div class="fs-4 fw-bold text-warning">${{ totales_anuales.total_gastos|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100 {% if totales_anuales.es_perdida %}border-danger{% else %}border-success{% endif %}">
+            <div class="card-body">
+                <div class="text-muted small mb-1">{% if totales_anuales.es_perdida %}Pérdida anual{% else %}Utilidad anual{% endif %}</div>
+                <div class="fs-4 fw-bold {% if totales_anuales.es_perdida %}text-danger{% else %}text-success{% endif %}">
+                    ${{ totales_anuales.utilidad|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla resumen mensual -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">📅 Resumen por Mes — {{ anio }}</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th class="text-end"># Viajes</th>
+                        <th class="text-end">Ingresos</th>
+                        <th class="text-end">Diesel</th>
+                        <th class="text-end">Casetas</th>
+                        <th class="text-end">Otros</th>
+                        <th class="text-end">Total Gastos</th>
+                        <th class="text-end">Utilidad / Pérdida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in resumen_mensual %}
+                    <tr>
+                        <td><strong>{{ fila.mes_nombre }}</strong></td>
+                        <td class="text-end">{{ fila.num_viajes }}</td>
+                        <td class="text-end">${{ fila.ingresos|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.diesel|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.casetas|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.otros|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.total_gastos|floatformat:2 }}</td>
+                        <td class="text-end fw-bold {% if fila.es_perdida %}text-danger{% else %}text-success{% endif %}">
+                            {% if fila.es_perdida %}▼{% else %}▲{% endif %}
+                            ${{ fila.utilidad|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted py-4">Sin viajes registrados en {{ anio }}</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if resumen_mensual %}
+                <tfoot>
+                    <tr class="table-dark fw-bold">
+                        <td>TOTAL {{ anio }}</td>
+                        <td class="text-end">{{ totales_anuales.num_viajes }}</td>
+                        <td class="text-end">${{ totales_anuales.ingresos|floatformat:2 }}</td>
+                        <td class="text-end">${{ totales_anuales.diesel|floatformat:2 }}</td>
+                        <td class="text-end">${{ totales_anuales.casetas|floatformat:2 }}</td>
+                        <td class="text-end">${{ totales_anuales.otros|floatformat:2 }}</td>
+                        <td class="text-end">${{ totales_anuales.total_gastos|floatformat:2 }}</td>
+                        <td class="text-end {% if totales_anuales.es_perdida %}text-danger{% else %}text-success{% endif %}">
+                            ${{ totales_anuales.utilidad|floatformat:2 }}
+                        </td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla por unidad -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">🚛 Resumen por Unidad — {{ anio }}</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Unidad</th>
+                        <th class="text-end"># Viajes</th>
+                        <th class="text-end">Ingresos</th>
+                        <th class="text-end">Diesel</th>
+                        <th class="text-end">Casetas</th>
+                        <th class="text-end">Otros</th>
+                        <th class="text-end">Total Gastos</th>
+                        <th class="text-end">Utilidad / Pérdida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in resumen_unidades %}
+                    <tr>
+                        <td><strong>{{ fila.unidad_label }}</strong></td>
+                        <td class="text-end">{{ fila.num_viajes }}</td>
+                        <td class="text-end">${{ fila.ingresos|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.diesel|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.casetas|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.otros|floatformat:2 }}</td>
+                        <td class="text-end">${{ fila.total_gastos|floatformat:2 }}</td>
+                        <td class="text-end fw-bold {% if fila.es_perdida %}text-danger{% else %}text-success{% endif %}">
+                            {% if fila.es_perdida %}▼{% else %}▲{% endif %}
+                            ${{ fila.utilidad|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted py-4">Sin datos de unidades en {{ anio }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla detalle por número de viaje -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">📋 Detalle por Número de Viaje — {{ anio }}</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle" style="font-size: 0.87rem;">
+                <thead>
+                    <tr>
+                        <th># Viaje</th>
+                        <th>Fecha</th>
+                        <th>Unidad</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th class="text-end">Km</th>
+                        <th class="text-end">Ingresos</th>
+                        <th class="text-end">Diesel</th>
+                        <th class="text-end">Casetas</th>
+                        <th class="text-end">Otros</th>
+                        <th class="text-end">Total Gastos</th>
+                        <th class="text-end">Utilidad / Pérdida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in detalle_viajes %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'detalle_viaje' v.id %}" class="fw-bold text-decoration-none">
+                                {{ v.numero_viaje }}
+                            </a>
+                        </td>
+                        <td>{{ v.fecha_viaje|date:"d/m/Y"|default:"—" }}</td>
+                        <td>{{ v.unidad|default:"—" }}</td>
+                        <td>{{ v.origen }}</td>
+                        <td>{{ v.destino }}</td>
+                        <td class="text-end">
+                            {% if v.km_distancia %}{{ v.km_distancia|floatformat:1 }}{% else %}—{% endif %}
+                        </td>
+                        <td class="text-end">${{ v.costo_viaje|floatformat:2 }}</td>
+                        <td class="text-end">${{ v.gastos_diesel|floatformat:2 }}</td>
+                        <td class="text-end">${{ v.gastos_casetas|floatformat:2 }}</td>
+                        <td class="text-end">${{ v.otros_gastos|floatformat:2 }}</td>
+                        <td class="text-end">${{ v.total_gastos_calc|floatformat:2 }}</td>
+                        <td class="text-end fw-bold {% if v.utilidad_calc < 0 %}text-danger{% else %}text-success{% endif %}">
+                            {% if v.utilidad_calc < 0 %}▼{% else %}▲{% endif %}
+                            ${{ v.utilidad_calc|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="12" class="text-center text-muted py-4">Sin viajes registrados en {{ anio }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

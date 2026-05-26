@@ -9,4 +9,7 @@ urlpatterns = [
     path('accounts/register/', views.register, name='register'),
     path('api/calcular-distancia/', views.calcular_distancia, name='calcular_distancia'),
     path('viaje/<int:viaje_id>/', views.detalle_viaje, name='detalle_viaje'),
+    path('reportes/', views.reportes, name='reportes'),
+    path('reportes/exportar/excel/', views.exportar_reporte_excel, name='exportar_reporte_excel'),
+    path('reportes/exportar/pdf/', views.exportar_reporte_pdf, name='exportar_reporte_pdf'),
 ]
