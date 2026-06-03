@@ -260,7 +260,7 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 - Si `utilidad >= 0` → se muestra en **verde** como ganancia
 
 **Secciones del reporte:**
-1. **Resumen mensual:** agrupado por mes (`TruncMonth`)
+1. **Resumen mensual:** agrupado por mes (`TruncMonth`), incluye los números de viaje del mes como enlaces al detalle
 2. **Por unidad:** agrupado por `unidad__numero_economico`, ordenado de mayor a menor utilidad
 3. **Detalle por viaje:** tabla completa viaje a viaje, con link al detalle
 
@@ -325,3 +325,4 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 | 2026-05-26 | Enlace 📊 Reportes agregado al navbar en `base.html` |
 | 2026-05-26 | `reportlab==4.5.1` y `openpyxl==3.1.5` agregados a `requirements.txt` |
 | 2026-06-03 | Creación de `CONTEXT.md` con documentación completa del proyecto |
+| 2026-06-03 | Resumen mensual de reportes actualizado para mostrar números de viaje con enlaces al detalle |

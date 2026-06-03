@@ -82,6 +82,7 @@
                     <tr>
                         <th>Mes</th>
                         <th class="text-end"># Viajes</th>
+                        <th>Números de viaje</th>
                         <th class="text-end">Ingresos</th>
                         <th class="text-end">Diesel</th>
                         <th class="text-end">Casetas</th>
@@ -95,6 +96,19 @@
                     <tr>
                         <td><strong>{{ fila.mes_nombre }}</strong></td>
                         <td class="text-end">{{ fila.num_viajes }}</td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for viaje in fila.viajes %}
+                                    <a href="{% url 'detalle_viaje' viaje.id %}"
+                                       class="badge bg-primary text-decoration-none"
+                                       title="Ver detalle de {{ viaje.numero_viaje }}">
+                                        {{ viaje.numero_viaje }}
+                                    </a>
+                                {% empty %}
+                                    <span class="text-muted">-</span>
+                                {% endfor %}
+                            </div>
+                        </td>
                         <td class="text-end">${{ fila.ingresos|floatformat:2 }}</td>
                         <td class="text-end">${{ fila.diesel|floatformat:2 }}</td>
                         <td class="text-end">${{ fila.casetas|floatformat:2 }}</td>
@@ -106,7 +120,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="text-center text-muted py-4">Sin viajes registrados en {{ anio }}</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">Sin viajes registrados en {{ anio }}</td></tr>
                     {% endfor %}
                 </tbody>
                 {% if resumen_mensual %}
@@ -114,6 +128,7 @@
                     <tr class="table-dark fw-bold">
                         <td>TOTAL {{ anio }}</td>
                         <td class="text-end">{{ totales_anuales.num_viajes }}</td>
+                        <td class="text-muted">Ver detalle abajo</td>
                         <td class="text-end">${{ totales_anuales.ingresos|floatformat:2 }}</td>
                         <td class="text-end">${{ totales_anuales.diesel|floatformat:2 }}</td>
                         <td class="text-end">${{ totales_anuales.casetas|floatformat:2 }}</td>

@@ -208,7 +208,7 @@ def _calcular_datos_reporte(anio):
             ),
         )
         .select_related('unidad', 'tipo_unidad')
-        .order_by('fecha_viaje')
+        .order_by('fecha_viaje', 'numero_viaje')
     )
 
     # --- Resumen mensual ---
@@ -243,10 +243,15 @@ def _calcular_datos_reporte(anio):
         .order_by('mes')
     )
 
+    viajes_por_mes = {}
+    for viaje in viajes_anio:
+        viajes_por_mes.setdefault(viaje.fecha_viaje.month, []).append(viaje)
+
     resumen_mensual = []
     for fila in resumen_mensual_qs:
         fila['mes_nombre'] = MESES_ES.get(fila['mes'].month, '')
         fila['es_perdida'] = fila['utilidad'] < _CERO
+        fila['viajes'] = viajes_por_mes.get(fila['mes'].month, [])
         resumen_mensual.append(fila)
 
     # --- Resumen por unidad ---
