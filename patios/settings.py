@@ -116,7 +116,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 
-# --- OpenRouteService ---
+# --- OpenRouteService --- para trazar rutas en el mapa
 ORS_API_KEY = config('ORS_API_KEY', default='')
 
 # --- Production security headers ---
