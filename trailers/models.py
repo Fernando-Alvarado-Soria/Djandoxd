@@ -117,12 +117,34 @@ class Viaje(models.Model):
         verbose_name="Tipo de unidad"
     )
     origen = models.CharField(max_length=200, verbose_name="Origen")
+    codigo_postal_origen = models.CharField(
+        max_length=10, blank=True,
+        verbose_name="Código postal de origen"
+    )
     destino = models.CharField(max_length=200, verbose_name="Destino")
+    codigo_postal_destino = models.CharField(
+        max_length=10, blank=True,
+        verbose_name="Código postal de destino"
+    )
     km_distancia = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
         verbose_name="Distancia (km, solo ida)"
     )
     viaje_redondo = models.BooleanField(default=False, verbose_name="¿Viaje redondo (ida y vuelta)?")
+    peso_carga = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        verbose_name="Peso adicional de la carga"
+    )
+    unidad_peso = models.CharField(
+        max_length=3,
+        choices=[
+            ('kg', 'Kilogramos'),
+            ('ton', 'Toneladas'),
+            ('lb', 'Libras'),
+        ],
+        default='kg',
+        verbose_name="Unidad de peso"
+    )
     precio_diesel_litro = models.DecimalField(
         max_digits=8, decimal_places=3, null=True, blank=True,
         verbose_name="Precio diesel por litro ($)"

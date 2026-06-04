@@ -73,14 +73,17 @@ class UnidadAdmin(admin.ModelAdmin):
 
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ['numero_viaje', 'numero_contenedor', 'origen', 'destino', 'pagado', 'costo_viaje', 'ganancia', 'fecha_creacion']
+    list_display = ['numero_viaje', 'numero_contenedor', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino', 'pagado', 'costo_viaje', 'ganancia', 'fecha_creacion']
     list_filter = ['fecha_creacion', 'pagado', 'origen', 'destino']
-    search_fields = ['numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'destino']
+    search_fields = ['numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino']
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
     
     fieldsets = (
         ('Información del Viaje', {
-            'fields': ('numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'destino')
+            'fields': ('numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino')
+        }),
+        ('Unidad y carga', {
+            'fields': ('tipo_unidad', 'peso_carga', 'unidad_peso')
         }),
         ('Estado de Pago', {
             'fields': ('pagado', 'fecha_pago', 'fecha_viaje')

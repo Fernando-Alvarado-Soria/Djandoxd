@@ -51,6 +51,23 @@
                             {% if form.tipo_unidad.errors %}<div class="text-danger">{{ form.tipo_unidad.errors }}</div>{% endif %}
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="{{ form.peso_carga.id_for_label }}" class="form-label">
+                                <strong>{{ form.peso_carga.label }}</strong>
+                            </label>
+                            {{ form.peso_carga }}
+                            <small class="text-muted">Se usa para ajustar el rendimiento estimado de diesel.</small>
+                            {% if form.peso_carga.errors %}<div class="text-danger">{{ form.peso_carga.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.unidad_peso.id_for_label }}" class="form-label">
+                                <strong>{{ form.unidad_peso.label }}</strong>
+                            </label>
+                            {{ form.unidad_peso }}
+                            {% if form.unidad_peso.errors %}<div class="text-danger">{{ form.unidad_peso.errors }}</div>{% endif %}
+                        </div>
+                    </div>
 
                     <!-- Origen / Destino -->
                     <div class="row">
@@ -67,6 +84,22 @@
                             </label>
                             {{ form.destino }}
                             {% if form.destino.errors %}<div class="text-danger">{{ form.destino.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.codigo_postal_origen.id_for_label }}" class="form-label">
+                                <strong>{{ form.codigo_postal_origen.label }}</strong> <span class="text-muted">(Opcional)</span>
+                            </label>
+                            {{ form.codigo_postal_origen }}
+                            {% if form.codigo_postal_origen.errors %}<div class="text-danger">{{ form.codigo_postal_origen.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.codigo_postal_destino.id_for_label }}" class="form-label">
+                                <strong>{{ form.codigo_postal_destino.label }}</strong> <span class="text-muted">(Opcional)</span>
+                            </label>
+                            {{ form.codigo_postal_destino }}
+                            {% if form.codigo_postal_destino.errors %}<div class="text-danger">{{ form.codigo_postal_destino.errors }}</div>{% endif %}
                         </div>
                     </div>
 
@@ -207,6 +240,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const tipoUnidadSelect = document.getElementById('id_tipo_unidad');
     const kmInput = document.getElementById('id_km_distancia');
     const redondoCheck = document.getElementById('id_viaje_redondo');
+    const pesoCargaInput = document.getElementById('id_peso_carga');
+    const unidadPesoSelect = document.getElementById('id_unidad_peso');
     const precioDieselInput = document.getElementById('id_precio_diesel_litro');
     const gastosDieselInput = document.getElementById('id_gastos_diesel');
     const rendimientoInfo = document.getElementById('rendimiento_info');
@@ -221,9 +256,38 @@ document.addEventListener('DOMContentLoaded', function () {
         return uid && rendimientos[uid] ? parseFloat(rendimientos[uid]) : null;
     }
 
+    function getPesoToneladas() {
+        const peso = parseFloat(pesoCargaInput.value) || 0;
+        const unidad = unidadPesoSelect.value;
+        if (peso <= 0) return 0;
+        if (unidad === 'ton') return peso;
+        if (unidad === 'lb') return peso * 0.000453592;
+        return peso / 1000;
+    }
+
+    function getRendimientoAjustado() {
+        const rendimientoBase = getRendimiento();
+        if (!rendimientoBase) return null;
+
+        const toneladas = getPesoToneladas();
+        if (toneladas <= 0) return rendimientoBase;
+
+        const factorConsumo = 1 + (toneladas * 0.03);
+        const rendimientoAjustado = rendimientoBase / factorConsumo;
+        return Math.max(rendimientoAjustado, rendimientoBase * 0.2);
+    }
+
     function actualizarRendimientoInfo() {
         const r = getRendimiento();
-        rendimientoInfo.textContent = r ? `Rendimiento: ${r} km/litro` : '';
+        const ajustado = getRendimientoAjustado();
+        const toneladas = getPesoToneladas();
+        if (!r) {
+            rendimientoInfo.textContent = '';
+            return;
+        }
+        rendimientoInfo.textContent = toneladas > 0
+            ? `Rendimiento base: ${r} km/litro | Ajustado por peso: ${ajustado.toFixed(2)} km/litro`
+            : `Rendimiento: ${r} km/litro`;
     }
 
     function actualizarStatusKm() {
@@ -239,7 +303,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const km = parseFloat(kmInput.value) || 0;
         const redondo = redondoCheck.checked;
         const precio = parseFloat(precioDieselInput.value) || 0;
-        const rendimiento = getRendimiento();
+        const rendimiento = getRendimientoAjustado();
+        const toneladas = getPesoToneladas();
 
         // Mensajes si faltan datos
         if (!rendimiento) {
@@ -263,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const costo = litros * precio;
         gastosDieselInput.value = costo.toFixed(2);
         calculoDetalle.textContent =
-            `${km} km${redondo ? ' × 2 (redondo)' : ''} = ${kmTotal} km ÷ ${rendimiento} km/L = ${litros.toFixed(1)} L × $${precio} = $${costo.toFixed(2)}`;
+            `${km} km${redondo ? ' × 2 (redondo)' : ''} = ${kmTotal} km ÷ ${rendimiento.toFixed(2)} km/L${toneladas > 0 ? ' (ajustado por peso)' : ''} = ${litros.toFixed(1)} L × $${precio} = $${costo.toFixed(2)}`;
         calculoInfo.style.display = 'block';
     }
 
@@ -280,12 +345,22 @@ document.addEventListener('DOMContentLoaded', function () {
         actualizarStatusKm();
         calcularGastosDiesel();
     });
+    pesoCargaInput.addEventListener('input', function () {
+        actualizarRendimientoInfo();
+        calcularGastosDiesel();
+    });
+    unidadPesoSelect.addEventListener('change', function () {
+        actualizarRendimientoInfo();
+        calcularGastosDiesel();
+    });
     precioDieselInput.addEventListener('input', calcularGastosDiesel);
 
     // --- Calcular km con ORS ---
     document.getElementById('btn_calcular_km').addEventListener('click', function () {
         const origen = document.getElementById('id_origen').value.trim();
         const destino = document.getElementById('id_destino').value.trim();
+        const codigoPostalOrigen = document.getElementById('id_codigo_postal_origen').value.trim();
+        const codigoPostalDestino = document.getElementById('id_codigo_postal_destino').value.trim();
 
         if (!origen || !destino) {
             statusEl.textContent = '⚠️ Ingresa origen y destino primero.';
@@ -295,7 +370,10 @@ document.addEventListener('DOMContentLoaded', function () {
         statusEl.textContent = '⏳ Calculando...';
         this.disabled = true;
 
-        const url = "{% url 'calcular_distancia' %}?origen=" + encodeURIComponent(origen) + "&destino=" + encodeURIComponent(destino);
+        const url = "{% url 'calcular_distancia' %}?origen=" + encodeURIComponent(origen)
+            + "&destino=" + encodeURIComponent(destino)
+            + "&codigo_postal_origen=" + encodeURIComponent(codigoPostalOrigen)
+            + "&codigo_postal_destino=" + encodeURIComponent(codigoPostalDestino);
 
         fetch(url)
             .then(r => r.json())

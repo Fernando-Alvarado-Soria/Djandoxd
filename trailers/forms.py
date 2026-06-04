@@ -36,7 +36,8 @@ class ViajeForm(forms.ModelForm):
         model = Viaje
         fields = [
             'numero_viaje', 'numero_contenedor', 'numero_factura',
-            'tipo_unidad', 'origen', 'destino',
+            'tipo_unidad', 'peso_carga', 'unidad_peso',
+            'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino',
             'km_distancia', 'viaje_redondo', 'precio_diesel_litro',
             'pagado', 'fecha_pago', 'fecha_viaje',
             'gastos_casetas', 'gastos_diesel', 'otros_gastos',
@@ -47,8 +48,21 @@ class ViajeForm(forms.ModelForm):
             'numero_contenedor': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de contenedor'}),
             'numero_factura': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de factura'}),
             'tipo_unidad': forms.Select(attrs={'class': 'form-control', 'id': 'id_tipo_unidad'}),
+            'peso_carga': forms.NumberInput(attrs={
+                'class': 'form-control', 'step': '0.01', 'min': '0',
+                'id': 'id_peso_carga', 'placeholder': 'Ej: 12.5'
+            }),
+            'unidad_peso': forms.Select(attrs={'class': 'form-control', 'id': 'id_unidad_peso'}),
             'origen': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Lázaro Cárdenas, Michoacán'}),
+            'codigo_postal_origen': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Ej: 60950',
+                'inputmode': 'numeric'
+            }),
             'destino': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Puebla, Puebla'}),
+            'codigo_postal_destino': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Ej: 72000',
+                'inputmode': 'numeric'
+            }),
             'km_distancia': forms.NumberInput(attrs={
                 'class': 'form-control', 'step': '0.01', 'min': '0',
                 'id': 'id_km_distancia', 'placeholder': 'Se calcula automáticamente'
@@ -77,6 +91,10 @@ class ViajeForm(forms.ModelForm):
         self.fields['fecha_viaje'].required = False
         self.fields['km_distancia'].required = False
         self.fields['precio_diesel_litro'].required = False
+        self.fields['codigo_postal_origen'].required = False
+        self.fields['codigo_postal_destino'].required = False
+        self.fields['peso_carga'].required = False
+        self.fields['unidad_peso'].required = False
         self.fields['tipo_unidad'].required = False
         self.fields['tipo_unidad'].queryset = TipoUnidad.objects.all()
         self.fields['tipo_unidad'].empty_label = '— Selecciona tipo de unidad —'

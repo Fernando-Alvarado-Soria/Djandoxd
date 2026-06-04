@@ -96,6 +96,8 @@ def calcular_distancia(request):
 
     origen = request.GET.get('origen', '').strip()
     destino = request.GET.get('destino', '').strip()
+    codigo_postal_origen = request.GET.get('codigo_postal_origen', '').strip()
+    codigo_postal_destino = request.GET.get('codigo_postal_destino', '').strip()
 
     if not origen or not destino:
         return JsonResponse({'error': 'Origen y destino son requeridos'}, status=400)
@@ -104,11 +106,14 @@ def calcular_distancia(request):
     if not api_key:
         return JsonResponse({'error': 'API key de ORS no configurada'}, status=500)
 
-    def geocodificar(lugar):
+    def geocodificar(lugar, codigo_postal=''):
         url = 'https://api.openrouteservice.org/geocode/search'
+        texto_busqueda = ', '.join(
+            parte for parte in [lugar, codigo_postal, 'México'] if parte
+        )
         params = {
             'api_key': api_key,
-            'text': lugar + ', México',
+            'text': texto_busqueda,
             'size': 1,
             'boundary.country': 'MX',
         }
@@ -121,8 +126,8 @@ def calcular_distancia(request):
         return coords
 
     try:
-        coords_origen = geocodificar(origen)
-        coords_destino = geocodificar(destino)
+        coords_origen = geocodificar(origen, codigo_postal_origen)
+        coords_destino = geocodificar(destino, codigo_postal_destino)
 
         if not coords_origen or not coords_destino:
             return JsonResponse({'error': 'No se pudo encontrar alguna de las ubicaciones'}, status=404)

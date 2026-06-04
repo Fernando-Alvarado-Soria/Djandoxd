@@ -104,6 +104,7 @@ La DB de desarrollo también es la misma de DigitalOcean (no se usa SQLite local
 | `0007_tipounidad_viaje_tipo_unidad` | Modelo TipoUnidad, FK en Viaje |
 | `0008_seed_tipos_unidad` | Data migration: 9 tipos de unidad precargados |
 | `0009_alter_viaje_precio_diesel_litro` | precio_diesel_litro a 3 decimales |
+| `0010_viaje_codigos_postales_peso_carga` | Códigos postales de origen/destino y peso adicional de carga |
 
 ---
 
@@ -186,9 +187,13 @@ openpyxl==3.1.5
 | `unidad` | FK → Unidad | SET_NULL, opcional |
 | `tipo_unidad` | FK → TipoUnidad | SET_NULL, opcional |
 | `origen` | CharField(200) | Ciudad de origen |
+| `codigo_postal_origen` | CharField(10) | Opcional, mejora precisión en ORS |
 | `destino` | CharField(200) | Ciudad de destino |
+| `codigo_postal_destino` | CharField(10) | Opcional, mejora precisión en ORS |
 | `km_distancia` | DecimalField(10,2) | Calculado por ORS, solo ida |
 | `viaje_redondo` | BooleanField | default=False |
+| `peso_carga` | DecimalField(10,2) | Opcional, peso adicional para ajustar rendimiento |
+| `unidad_peso` | CharField(3) | `kg`, `ton` o `lb`; default=`kg` |
 | `precio_diesel_litro` | DecimalField(8,3) | 3 decimales, ej: 28.015 |
 | `pagado` | BooleanField | default=False |
 | `fecha_pago` | DateField | Opcional |
@@ -239,9 +244,9 @@ openpyxl==3.1.5
 | **Setting Django** | `ORS_API_KEY = config('ORS_API_KEY', default='')` en `settings.py` |
 
 **Flujo del endpoint `/api/calcular-distancia/`:**
-1. Recibe `?origen=...&destino=...` (nombres de ciudades)
-2. Geocodifica origen → coordenadas `[lon, lat]` con `boundary.country=MX`
-3. Geocodifica destino → coordenadas `[lon, lat]`
+1. Recibe `?origen=...&destino=...` y opcionalmente `codigo_postal_origen` / `codigo_postal_destino`
+2. Geocodifica origen + código postal → coordenadas `[lon, lat]` con `boundary.country=MX`
+3. Geocodifica destino + código postal → coordenadas `[lon, lat]`
 4. Llama a `POST /v2/directions/driving-car` con las dos coordenadas
 5. Retorna `{"km": float}` o `{"error": "..."}` con código HTTP apropiado
 
@@ -280,9 +285,10 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 
 **JS en formularios de viaje (agregar/editar):**
 - `getRendimiento()` → lee el rendimiento del tipo de unidad seleccionado
-- `calcularGastosDiesel()` → calcula automáticamente `gastos_diesel = (km_total / rendimiento) * precio_litro`
+- `getRendimientoAjustado()` → ajusta el rendimiento por peso adicional: cada tonelada agrega 3% de consumo estimado
+- `calcularGastosDiesel()` → calcula automáticamente `gastos_diesel = (km_total / rendimiento_ajustado) * precio_litro`
 - `actualizarStatusKm()` → muestra km ida o km×2 si es viaje redondo
-- `calcularDistancia()` → llama al endpoint ORS y rellena el campo `km_distancia`
+- `calcularDistancia()` → llama al endpoint ORS usando ciudad + código postal y rellena el campo `km_distancia`
 
 ---
 
@@ -326,3 +332,4 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 | 2026-05-26 | `reportlab==4.5.1` y `openpyxl==3.1.5` agregados a `requirements.txt` |
 | 2026-06-03 | Creación de `CONTEXT.md` con documentación completa del proyecto |
 | 2026-06-03 | Resumen mensual de reportes actualizado para mostrar números de viaje con enlaces al detalle |
+| 2026-06-04 | Agregados códigos postales de origen/destino, peso de carga, unidad de peso y ajuste de diesel por peso en formularios de viaje |
