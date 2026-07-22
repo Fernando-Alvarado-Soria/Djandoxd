@@ -20,6 +20,7 @@
                                 <tr>
                                     <th>Número de Viaje</th>
                                     <th>Ruta</th>
+                                    <th>Chofer</th>
                                     <th>Gastos Casetas</th>
                                     <th>Gastos Diesel</th>
                                     <th>Otros Gastos</th>
@@ -39,6 +40,13 @@
                                         </a>
                                     </td>
                                     <td>{{ viaje.origen }} → {{ viaje.destino }}</td>
+                                    <td>
+                                        {% if viaje.operador %}
+                                            {{ viaje.operador.nombre }}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
                                     <td>${{ viaje.gastos_casetas|floatformat:2 }}</td>
                                     <td>${{ viaje.gastos_diesel|floatformat:2 }}</td>
                                     <td>${{ viaje.otros_gastos|floatformat:2 }}</td>
@@ -79,8 +87,8 @@
                             </tbody>
                             <tfoot>
                                 <tr class="table-info">
-                                    <td colspan="6" class="text-end"><strong>Total Ganancia:</strong></td>
-                                    <td colspan="3">
+                                    <td colspan="7" class="text-end"><strong>Total Ganancia:</strong></td>
+                                    <td colspan="4">
                                         <strong class="text-success">
                                             ${% widthratio viajes.count 1 0 %}
                                             {% for viaje in viajes %}

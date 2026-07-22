@@ -44,9 +44,9 @@ Djandoxd/
     ├── models.py                 # Modelos: Cliente, Operador, TipoUnidad, Unidad, Viaje
     ├── views.py                  # Todas las vistas y lógica de negocio
     ├── urls.py                   # URLs de la app trailers
-    ├── forms.py                  # ViajeForm y AdminUserCreationForm
+    ├── forms.py                  # ViajeForm, OperadorForm y AdminUserCreationForm
     ├── admin.py                  # Registro de modelos en Django Admin
-    ├── migrations/               # 0001 al 0009 aplicadas
+    ├── migrations/               # 0001 al 0011 aplicadas
     └── templates/trailers/
         ├── base.html             # Template base con navbar, dark mode, Bootstrap 5
         ├── lista_viajes.html     # Listado de todos los viajes
@@ -54,6 +54,8 @@ Djandoxd/
         ├── editar_viaje.html     # Formulario edición viaje + JS cálculo diesel
         ├── detalle_viaje.html    # Vista solo lectura de un viaje
         ├── borrar_viaje.html     # Confirmación de borrado
+        ├── choferes.html         # Panel para dar de alta/listar choferes
+        ├── editar_chofer.html    # Formulario para editar choferes
         ├── reportes.html         # Dashboard de reportes mensuales
         └── registration/
             └── login.html
@@ -105,6 +107,7 @@ La DB de desarrollo también es la misma de DigitalOcean (no se usa SQLite local
 | `0008_seed_tipos_unidad` | Data migration: 9 tipos de unidad precargados |
 | `0009_alter_viaje_precio_diesel_litro` | precio_diesel_litro a 3 decimales |
 | `0010_viaje_codigos_postales_peso_carga` | Códigos postales de origen/destino y peso adicional de carga |
+| `0011_viaje_operador_alter_peso_carga` | FK de chofer en Viaje y etiqueta `Peso de la carga` |
 
 ---
 
@@ -156,6 +159,8 @@ openpyxl==3.1.5
 | `fecha_creacion` | DateTimeField | auto_now_add |
 | `fecha_actualizacion` | DateTimeField | auto_now |
 
+En la interfaz se presenta como **Chofer**. No crea usuarios de acceso a la plataforma; solo registra datos operativos para asignarlos a viajes.
+
 ### `TipoUnidad`
 | Campo | Tipo | Notas |
 |---|---|---|
@@ -186,13 +191,14 @@ openpyxl==3.1.5
 | `numero_factura` | CharField(100) | Opcional |
 | `unidad` | FK → Unidad | SET_NULL, opcional |
 | `tipo_unidad` | FK → TipoUnidad | SET_NULL, opcional |
+| `operador` | FK → Operador | SET_NULL, opcional; se muestra como "Elegir chofer" |
 | `origen` | CharField(200) | Ciudad de origen |
 | `codigo_postal_origen` | CharField(10) | Opcional, mejora precisión en ORS |
 | `destino` | CharField(200) | Ciudad de destino |
 | `codigo_postal_destino` | CharField(10) | Opcional, mejora precisión en ORS |
 | `km_distancia` | DecimalField(10,2) | Calculado por ORS, solo ida |
 | `viaje_redondo` | BooleanField | default=False |
-| `peso_carga` | DecimalField(10,2) | Opcional, peso adicional para ajustar rendimiento |
+| `peso_carga` | DecimalField(10,2) | Opcional, peso de la carga para ajustar rendimiento |
 | `unidad_peso` | CharField(3) | `kg`, `ton` o `lb`; default=`kg` |
 | `precio_diesel_litro` | DecimalField(8,3) | 3 decimales, ej: 28.015 |
 | `pagado` | BooleanField | default=False |
@@ -219,6 +225,8 @@ openpyxl==3.1.5
 | `/editar/<id>/` | `editar_viaje` | `editar_viaje` | Formulario edición |
 | `/borrar/<id>/` | `borrar_viaje` | `borrar_viaje` | Confirmar borrado |
 | `/viaje/<id>/` | `detalle_viaje` | `detalle_viaje` | Vista solo lectura |
+| `/choferes/` | `choferes` | `choferes` | Panel para dar de alta/listar choferes |
+| `/choferes/editar/<id>/` | `editar_chofer` | `editar_chofer` | Formulario edición de chofer |
 | `/accounts/login/` | `login` | Django built-in | Login |
 | `/accounts/logout/` | `logout` | Django built-in | Logout |
 | `/accounts/register/` | `register` | `register` | Crear usuario (solo staff) |
@@ -281,7 +289,7 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 - **Iconos:** Font Awesome 6.4 (CDN)
 - **Dark Mode:** Implementado con CSS variables en `base.html`, toggle guardado en `localStorage`
 - **Template base:** `trailers/base.html` — todos los demás templates extienden de este
-- **Navbar incluye:** Lista de Viajes, Agregar Viaje, 📊 Reportes, Panel Admin, Cerrar sesión, Toggle dark mode
+- **Navbar incluye:** Lista de Viajes, Agregar Viaje, Choferes, 📊 Reportes, Panel Admin, Cerrar sesión, Toggle dark mode
 
 **JS en formularios de viaje (agregar/editar):**
 - `getRendimiento()` → lee el rendimiento del tipo de unidad seleccionado
@@ -333,3 +341,4 @@ Los reportes filtran viajes por `fecha_viaje__year=anio` y `fecha_viaje__isnull=
 | 2026-06-03 | Creación de `CONTEXT.md` con documentación completa del proyecto |
 | 2026-06-03 | Resumen mensual de reportes actualizado para mostrar números de viaje con enlaces al detalle |
 | 2026-06-04 | Agregados códigos postales de origen/destino, peso de carga, unidad de peso y ajuste de diesel por peso en formularios de viaje |
+| 2026-07-22 | Panel de choferes agregado, asignación de chofer en viajes y cambio de etiqueta a `Peso de la carga` |

@@ -116,6 +116,10 @@ class Viaje(models.Model):
         TipoUnidad, on_delete=models.SET_NULL, null=True, blank=True,
         verbose_name="Tipo de unidad"
     )
+    operador = models.ForeignKey(
+        Operador, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name="Chofer"
+    )
     origen = models.CharField(max_length=200, verbose_name="Origen")
     codigo_postal_origen = models.CharField(
         max_length=10, blank=True,
@@ -133,7 +137,7 @@ class Viaje(models.Model):
     viaje_redondo = models.BooleanField(default=False, verbose_name="¿Viaje redondo (ida y vuelta)?")
     peso_carga = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
-        verbose_name="Peso adicional de la carga"
+        verbose_name="Peso de la carga"
     )
     unidad_peso = models.CharField(
         max_length=3,

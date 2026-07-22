@@ -35,6 +35,19 @@
                 <!-- Unidad -->
                 <h5 class="text-muted border-bottom pb-1 mb-3">Unidad</h5>
                 <div class="row mb-3">
+                    <div class="col-md-12">
+                        <small class="text-muted">Chofer asignado</small>
+                        <p class="mb-0">
+                            {% if viaje.operador %}
+                                {{ viaje.operador.nombre }}
+                                <span class="text-muted">(Lic: {{ viaje.operador.licencia }})</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3">
                     <div class="col-md-8">
                         <small class="text-muted">Tipo de unidad</small>
                         <p class="mb-0">
@@ -47,7 +60,7 @@
                         </p>
                     </div>
                     <div class="col-md-4">
-                        <small class="text-muted">Peso adicional</small>
+                        <small class="text-muted">Peso de la carga</small>
                         <p class="mb-0">
                             {% if viaje.peso_carga %}
                                 {{ viaje.peso_carga|floatformat:2 }} {{ viaje.get_unidad_peso_display }}

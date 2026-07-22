@@ -73,9 +73,9 @@ class UnidadAdmin(admin.ModelAdmin):
 
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ['numero_viaje', 'numero_contenedor', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino', 'pagado', 'costo_viaje', 'ganancia', 'fecha_creacion']
-    list_filter = ['fecha_creacion', 'pagado', 'origen', 'destino']
-    search_fields = ['numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino']
+    list_display = ['numero_viaje', 'numero_contenedor', 'operador', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino', 'pagado', 'costo_viaje', 'ganancia', 'fecha_creacion']
+    list_filter = ['fecha_creacion', 'pagado', 'operador', 'origen', 'destino']
+    search_fields = ['numero_viaje', 'numero_contenedor', 'numero_factura', 'operador__nombre', 'operador__licencia', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino']
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
     
     fieldsets = (
@@ -83,7 +83,7 @@ class ViajeAdmin(admin.ModelAdmin):
             'fields': ('numero_viaje', 'numero_contenedor', 'numero_factura', 'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino')
         }),
         ('Unidad y carga', {
-            'fields': ('tipo_unidad', 'peso_carga', 'unidad_peso')
+            'fields': ('operador', 'tipo_unidad', 'peso_carga', 'unidad_peso')
         }),
         ('Estado de Pago', {
             'fields': ('pagado', 'fecha_pago', 'fecha_viaje')

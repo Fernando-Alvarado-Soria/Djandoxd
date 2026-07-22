@@ -4,8 +4,8 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.db.models import Sum, Count, F, ExpressionWrapper, DecimalField, Value
 from django.db.models.functions import TruncMonth, Coalesce
-from .models import Viaje, Unidad, TipoUnidad
-from .forms import ViajeForm
+from .models import Viaje, TipoUnidad, Operador
+from .forms import ViajeForm, OperadorForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from .forms import AdminUserCreationForm
@@ -31,7 +31,7 @@ from openpyxl.utils import get_column_letter
 @login_required
 def lista_viajes(request):
     """Vista para listar todos los viajes"""
-    viajes = Viaje.objects.all()
+    viajes = Viaje.objects.select_related('operador').all()
     return render(request, 'trailers/lista_viajes.html', {'viajes': viajes})
 
 
@@ -69,7 +69,7 @@ def editar_viaje(request, viaje_id):
 @login_required
 def detalle_viaje(request, viaje_id):
     """Vista de solo lectura para ver todos los datos de un viaje"""
-    viaje = get_object_or_404(Viaje, id=viaje_id)
+    viaje = get_object_or_404(Viaje.objects.select_related('operador', 'tipo_unidad'), id=viaje_id)
     return render(request, 'trailers/detalle_viaje.html', {'viaje': viaje})
 
 
@@ -82,6 +82,44 @@ def borrar_viaje(request, viaje_id):
         messages.success(request, 'Viaje eliminado exitosamente.')
         return redirect('lista_viajes')
     return render(request, 'trailers/borrar_viaje.html', {'viaje': viaje})
+
+
+@login_required
+def choferes(request):
+    """Panel para registrar y listar choferes operativos."""
+    if request.method == 'POST':
+        form = OperadorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Chofer registrado exitosamente.')
+            return redirect('choferes')
+    else:
+        form = OperadorForm(initial={'activo': True})
+
+    operadores = Operador.objects.all()
+    return render(request, 'trailers/choferes.html', {
+        'form': form,
+        'operadores': operadores,
+    })
+
+
+@login_required
+def editar_chofer(request, operador_id):
+    """Editar los datos simples de un chofer."""
+    operador = get_object_or_404(Operador, id=operador_id)
+    if request.method == 'POST':
+        form = OperadorForm(request.POST, instance=operador)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Chofer actualizado exitosamente.')
+            return redirect('choferes')
+    else:
+        form = OperadorForm(instance=operador)
+
+    return render(request, 'trailers/editar_chofer.html', {
+        'form': form,
+        'operador': operador,
+    })
 
 
 def staff_check(user):
@@ -212,7 +250,7 @@ def _calcular_datos_reporte(anio):
                 **expr_opts
             ),
         )
-        .select_related('unidad', 'tipo_unidad')
+        .select_related('unidad', 'tipo_unidad', 'operador')
         .order_by('fecha_viaje', 'numero_viaje')
     )
 

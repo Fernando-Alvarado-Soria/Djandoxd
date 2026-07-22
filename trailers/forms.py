@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db.models import Q
+
+from .models import Viaje, TipoUnidad, Operador
 
 
 class AdminUserCreationForm(UserCreationForm):
@@ -16,8 +19,28 @@ class AdminUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-from django import forms
-from .models import Viaje, Unidad, TipoUnidad
+
+
+class OperadorForm(forms.ModelForm):
+    class Meta:
+        model = Operador
+        fields = ['nombre', 'licencia', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre completo del chofer'
+            }),
+            'licencia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número de licencia'
+            }),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'nombre': 'Nombre del chofer',
+            'licencia': 'Número de licencia',
+            'activo': 'Chofer activo',
+        }
 
 
 class ViajeForm(forms.ModelForm):
@@ -36,7 +59,7 @@ class ViajeForm(forms.ModelForm):
         model = Viaje
         fields = [
             'numero_viaje', 'numero_contenedor', 'numero_factura',
-            'tipo_unidad', 'peso_carga', 'unidad_peso',
+            'operador', 'tipo_unidad', 'peso_carga', 'unidad_peso',
             'origen', 'codigo_postal_origen', 'destino', 'codigo_postal_destino',
             'km_distancia', 'viaje_redondo', 'precio_diesel_litro',
             'pagado', 'fecha_pago', 'fecha_viaje',
@@ -47,6 +70,7 @@ class ViajeForm(forms.ModelForm):
             'numero_viaje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: V-001'}),
             'numero_contenedor': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de contenedor'}),
             'numero_factura': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de factura'}),
+            'operador': forms.Select(attrs={'class': 'form-control', 'id': 'id_operador'}),
             'tipo_unidad': forms.Select(attrs={'class': 'form-control', 'id': 'id_tipo_unidad'}),
             'peso_carga': forms.NumberInput(attrs={
                 'class': 'form-control', 'step': '0.01', 'min': '0',
@@ -95,6 +119,15 @@ class ViajeForm(forms.ModelForm):
         self.fields['codigo_postal_destino'].required = False
         self.fields['peso_carga'].required = False
         self.fields['unidad_peso'].required = False
+        self.fields['operador'].required = False
+        operadores_qs = Operador.objects.filter(activo=True)
+        if self.instance and self.instance.pk and self.instance.operador_id:
+            operadores_qs = Operador.objects.filter(
+                Q(activo=True) | Q(pk=self.instance.operador_id)
+            )
+        self.fields['operador'].queryset = operadores_qs.order_by('nombre')
+        self.fields['operador'].empty_label = '— Elegir chofer —'
+        self.fields['operador'].label = 'Elegir chofer'
         self.fields['tipo_unidad'].required = False
         self.fields['tipo_unidad'].queryset = TipoUnidad.objects.all()
         self.fields['tipo_unidad'].empty_label = '— Selecciona tipo de unidad —'

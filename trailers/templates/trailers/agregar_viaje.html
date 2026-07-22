@@ -40,6 +40,16 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.operador.id_for_label }}" class="form-label">
+                                <strong>{{ form.operador.label }}</strong>
+                            </label>
+                            {{ form.operador }}
+                            {% if form.operador.errors %}<div class="text-danger">{{ form.operador.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
                     <!-- Unidad -->
                     <div class="row">
                         <div class="col-md-12 mb-3">
